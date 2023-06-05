@@ -18,15 +18,14 @@ jobs:
       with:
         credentials_json: '${{ secrets.GKE_KEY }}'
 
-    # Setup gcloud CLI
-    - uses: google-github-actions/setup-gcloud@v1
-      with:
-        version: '390.0.0'
-        service_account_key: ${{ secrets.GKE_KEY }}
+ #   # Setup gcloud CLI
+ #   - uses: google-github-actions/setup-gcloud@v1
+ #     with:
+ #       service_account_key: ${{ secrets.GKE_KEY }}
 
     # Configure docker to use the gcloud command-line tool as a credential helper
     - run: |
-        gcloud auth configure-docker --project ilia456
+        gcloud auth configure-docker
         gcloud info
 
     # Build the Docker image
