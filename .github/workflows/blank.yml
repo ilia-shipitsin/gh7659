@@ -6,24 +6,31 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # example with gcloud service account key
-  build-and-push-to-gcr-service-account:
-    name: Build & push - with service account
+
+  build:
+    name: Build and Push Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Authenticate to Google Cloud
-        id: auth
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: '${{ secrets.GKE_KEY }}'
-      - name: Building and pushing the image
-        uses: RafikFarhad/push-to-gcr-github-action@v5-beta # <- use this on your workflow
-        with:
-          registry: gcr.io
-          project_id: ilia456
-          image_name: hello
-          image_tag: stable
-          dockerfile: Dockerfile
+    - uses: actions/checkout@v2
 
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GKE_KEY }}'
 
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: '390.0.0'
+        service_account_key: ${{ secrets.GKE_KEY }}
+
+    # Configure docker to use the gcloud command-line tool as a credential helper
+    - run: |
+        gcloud auth configure-docker --project ilia456
+        gcloud info
+
+    # Build the Docker image
+    - name: Build and Push
+      run: |
+        docker build -t gcr.io/ilia456/echo:stable -f Dockerfile .
+        docker push gcr.io/ilia456/echo:stable
