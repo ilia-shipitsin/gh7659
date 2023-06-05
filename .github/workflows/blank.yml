@@ -20,21 +20,18 @@ jobs:
 
     # Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@v1
-      # with:
-        # version: '390.0.0'
-        # service_account_key: ${{ secrets.GKE_KEY }}
+      with:
+        version: '390.0.0'
+        service_account_key: ${{ secrets.GKE_KEY }}
 
     # Configure docker to use the gcloud command-line tool as a credential helper
     - run: |
-        # Set up docker to authenticate
-        # via gcloud command-line tool.
         gcloud auth configure-docker
         gcloud info
 
     # Build the Docker image
     - name: Build and Push
       run: |
-        IMAGE=gcr.io/ilia456/echo:stable
         docker build -t gcr.io/ilia456/echo:stable -f Dockerfile .
         docker push gcr.io/ilia456/echo:stable
 
